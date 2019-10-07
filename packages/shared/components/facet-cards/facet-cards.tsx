@@ -2,26 +2,18 @@ import "./facet-cards.scss";
 
 import { FundFacet, ProgramFacet } from "gv-api-web";
 import * as React from "react";
-import { RefObject } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import withLoader from "shared/decorators/with-loader";
 
 import FacetCard, { composeFacetUrlFunc } from "./facet-card";
 
-class _FacetCards extends React.PureComponent<Props> {
-  scroll: RefObject<HTMLDivElement> = React.createRef();
-  facetList: RefObject<HTMLDivElement> = React.createRef();
+const _FacetCards: React.FC<Props> = ({ facets, composeFacetUrl, title }) => {
+  const scroll = useRef<HTMLDivElement>(null);
+  const facetList = useRef<HTMLDivElement>(null);
 
-  handleScroll = (): void => {
-    this.updateClassList();
-  };
-
-  componentDidMount = (): void => {
-    this.updateClassList();
-  };
-
-  updateClassList = (): void => {
-    const node = this.scroll.current;
-    const list = this.facetList.current;
+  const updateClassList = () => {
+    const node = scroll.current;
+    const list = facetList.current;
 
     const scrollLeft = node ? node.scrollLeft : 0;
     const scrollWidth = node ? node.scrollWidth : 0;
@@ -40,26 +32,37 @@ class _FacetCards extends React.PureComponent<Props> {
     }
   };
 
-  render() {
-    const { facets, composeFacetUrl, title } = this.props;
-    return (
-      <div className="facets__wrapper facets__shadow" ref={this.facetList}>
-        <div className="facets" ref={this.scroll} onScroll={this.handleScroll}>
-          <div className="facets__carousel">
-            {facets.map(x => (
-              <FacetCard
-                title={title}
-                key={x.id}
-                facet={x}
-                composeFacetUrl={composeFacetUrl}
-              />
-            ))}
-          </div>
+  const handleScroll = useCallback(
+    () => {
+      updateClassList();
+    },
+    [scroll, facetList]
+  );
+
+  useEffect(
+    () => {
+      updateClassList();
+    },
+    [scroll, facetList]
+  );
+
+  return (
+    <div className="facets__wrapper facets__shadow" ref={facetList}>
+      <div className="facets" ref={scroll} onScroll={handleScroll}>
+        <div className="facets__carousel">
+          {facets.map(facet => (
+            <FacetCard
+              title={title}
+              key={facet.id}
+              facet={facet}
+              composeFacetUrl={composeFacetUrl}
+            />
+          ))}
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 interface Props {
   facets: Array<FundFacet & ProgramFacet>;
@@ -67,5 +70,5 @@ interface Props {
   title: string;
 }
 
-const FacetCards = withLoader(_FacetCards);
+const FacetCards = withLoader(React.memo(_FacetCards));
 export default FacetCards;
