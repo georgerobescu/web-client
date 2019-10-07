@@ -1,8 +1,6 @@
 import * as React from "react";
-import { WithTranslation, withTranslation as translate } from "react-i18next";
-import FacetCardsContainer, {
-  ASSETS_FACETS
-} from "shared/components/facet-cards/faset-cards-container";
+import { useTranslation } from "react-i18next";
+import FacetCardsContainer, { ASSETS_FACETS } from "shared/components/facet-cards/faset-cards-container";
 import NavigationTabsContainer from "shared/components/navigation-tabs/navigation-tabs-container";
 import Page from "shared/components/page/page";
 import Surface from "shared/components/surface/surface";
@@ -14,7 +12,8 @@ import {
 } from "shared/routes/programs.routes";
 import { composeProgramFacetUrl } from "shared/utils/compose-url";
 
-const _ProgramsPage: React.FC<WithTranslation> = ({ t }) => {
+const _ProgramsPage: React.FC = () => {
+  const [t] = useTranslation();
   const title = t("programs-page.title");
   return (
     <Page title={title}>
@@ -39,5 +38,5 @@ const _ProgramsPage: React.FC<WithTranslation> = ({ t }) => {
   );
 };
 
-const ProgramsPage = translate()(React.memo(_ProgramsPage));
+const ProgramsPage = React.memo(_ProgramsPage);
 export default ProgramsPage;
