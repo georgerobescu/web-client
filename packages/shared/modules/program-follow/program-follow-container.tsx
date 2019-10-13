@@ -9,13 +9,16 @@ import { FOLLOW_TYPE } from "shared/constants/constants";
 import { alertMessageActions } from "shared/modules/alert-message/actions/alert-message-actions";
 import { CurrencyEnum, SetSubmittingType } from "shared/utils/types";
 
-import FollowPopupForm from "./follow-popup/follow-popup-form";
 import { useGetRate, useGetSignalInfo } from "./program-follow-container.hooks";
 import {
   attachToSignal,
   updateAttachToSignal
 } from "./services/program-follow-service";
+import dynamic from "next/dynamic";
 
+const FollowPopupForm = dynamic(() =>
+  import("./follow-popup/follow-popup-form")
+);
 const DEFAULT_RATE_CURRENCY = "USD";
 
 const _ProgramFollowContainer: React.FC<Props> = ({
@@ -41,16 +44,13 @@ const _ProgramFollowContainer: React.FC<Props> = ({
     getRate({ from: DEFAULT_RATE_CURRENCY, to: currency });
   }, []);
 
-  useEffect(
-    () => {
-      setType(
-        signalSubscription.hasActiveSubscription
-          ? FOLLOW_TYPE.EDIT
-          : FOLLOW_TYPE.CREATE
-      );
-    },
-    [signalSubscription]
-  );
+  useEffect(() => {
+    setType(
+      signalSubscription.hasActiveSubscription
+        ? FOLLOW_TYPE.EDIT
+        : FOLLOW_TYPE.CREATE
+    );
+  }, [signalSubscription]);
   const handleSubmit = useCallback(
     (
       id: string,

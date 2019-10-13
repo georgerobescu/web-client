@@ -3,18 +3,17 @@ import "./details-investment.scss";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ResolveThunks, connect, useDispatch, useSelector } from "react-redux";
+import { connect, ResolveThunks, useDispatch, useSelector } from "react-redux";
 import {
   ActionCreatorsMapObject,
-  Dispatch,
   bindActionCreators,
-  compose
+  compose,
+  Dispatch
 } from "redux";
 import DetailsBlock from "shared/components/details/details-block";
 import { IFundWithdrawalContainerProps } from "shared/components/funds/fund-details/fund-details.types";
 import GVTabs from "shared/components/gv-tabs";
 import GVTab from "shared/components/gv-tabs/gv-tab";
-import PortfolioEventsTable from "shared/components/portfolio-events-table/portfolio-events-table";
 import { IProgramReinvestingContainerOwnProps } from "shared/components/programs/program-details/program-details.types";
 import {
   EVENT_LOCATION,
@@ -33,10 +32,14 @@ import {
 } from "shared/utils/types";
 
 import { InvestmentDetails } from "./details-investment.helpers";
-import InvestmentContainer, {
-  haveActiveInvestment,
-  haveSubscription
-} from "./investment-container";
+import { haveActiveInvestment, haveSubscription } from "./investment-container";
+
+import dynamic from "next/dynamic";
+
+const PortfolioEventsTable = dynamic(() =>
+  import("shared/components/portfolio-events-table/portfolio-events-table")
+);
+const InvestmentContainer = dynamic(() => import("./investment-container"));
 
 const _DetailsInvestment: React.FC<Props> = ({
   fees,
@@ -58,18 +61,12 @@ const _DetailsInvestment: React.FC<Props> = ({
   const eventTypeFilterValues = useSelector(eventTypesSelector);
   const dispatch = useDispatch();
   const [haveEvents, setHaveEvents] = useState<boolean>(false);
-  useEffect(
-    () => {
-      isAuthenticated && id && dispatch(getEvents(id, EVENT_LOCATION.Asset)());
-    },
-    [isAuthenticated, id]
-  );
-  useEffect(
-    () => {
-      isAuthenticated && setHaveEvents(events.itemsData.data.total > 0);
-    },
-    [isAuthenticated, events]
-  );
+  useEffect(() => {
+    isAuthenticated && id && dispatch(getEvents(id, EVENT_LOCATION.Asset)());
+  }, [isAuthenticated, id]);
+  useEffect(() => {
+    isAuthenticated && setHaveEvents(events.itemsData.data.total > 0);
+  }, [isAuthenticated, events]);
   const haveInvestment =
     haveActiveInvestment(personalDetails) || haveSubscription(personalDetails);
   const showInvestment = haveEvents || haveInvestment;
@@ -93,7 +90,7 @@ const _DetailsInvestment: React.FC<Props> = ({
           />
         </GVTabs>
       </div>
-      {tab === TABS.INVESTMENT && (
+      {tab === TABS.INVESTMENT && haveInvestment && (
         <InvestmentContainer
           fees={fees}
           updateDescription={dispatchDescription}
@@ -106,7 +103,7 @@ const _DetailsInvestment: React.FC<Props> = ({
           ProgramReinvestingWidget={ProgramReinvestingWidget}
         />
       )}
-      {tab === TABS.EVENTS && (
+      {tab === TABS.EVENTS && haveEvents && (
         <PortfolioEventsTable
           getItems={getEvents(id!, EVENT_LOCATION.Asset)}
           selector={selector}

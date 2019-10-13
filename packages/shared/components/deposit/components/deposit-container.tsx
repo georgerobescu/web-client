@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Dialog, { IDialogProps } from "shared/components/dialog/dialog";
@@ -8,9 +9,14 @@ import useApiRequest from "shared/hooks/api-request.hook";
 import { currencySelector } from "shared/reducers/account-settings-reducer";
 import { CurrencyEnum, ReduxDispatch } from "shared/utils/types";
 
-import DepositPopup from "./deposit-popup";
 import { DepositInfoLoaderData } from "./deposit.loader";
-import { TAssetInvestCreator, TGetAssetInfoCreator, TInvestInfoWithWallets } from "./deposit.types";
+import {
+  TAssetInvestCreator,
+  TGetAssetInfoCreator,
+  TInvestInfoWithWallets
+} from "./deposit.types";
+
+const DepositPopup = dynamic(() => import("./deposit-popup"));
 
 const _DepositContainer: React.FC<Props> = ({
   assetInvest,
@@ -38,12 +44,9 @@ const _DepositContainer: React.FC<Props> = ({
   >({
     request: getDepositInfo
   });
-  useEffect(
-    () => {
-      id && open && getInvestInfo();
-    },
-    [open]
-  );
+  useEffect(() => {
+    id && open && getInvestInfo();
+  }, [open]);
 
   return (
     <Dialog open={open} onClose={onClose}>

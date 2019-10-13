@@ -2,10 +2,14 @@ import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import Dialog, { IDialogProps } from "shared/components/dialog/dialog";
 
-import ProgramUnfollowForm, {
-  IProgramUnfollowFormValues
-} from "./components/program-unfollow-form";
+import { IProgramUnfollowFormValues } from "./components/program-unfollow-form";
 import { detachToSignal } from "./services/program-unfollow.service";
+
+import dynamic from "next/dynamic";
+
+const ProgramUnfollowForm = dynamic(() =>
+  import("./components/program-unfollow-form")
+);
 
 const _ProgramUnfollowContainer: React.FC<Props> = ({
   open,
