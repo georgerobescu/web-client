@@ -12,7 +12,7 @@
     "start": "yarn copy && node index.js",
     "build": "yarn copy && next build",
     "production": "cross-env NODE_ENV=production node index.js",
-    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "analyze": "cross-env BUNDLE_ANALYZE=browser next build",
     "test": "react-scripts test --env=jsdom",
     "test:ui": "majestic",
     "eject": "react-scripts eject",
